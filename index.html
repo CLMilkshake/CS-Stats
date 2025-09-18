@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CS2 Stats Dashboard</title>
+    <style>
+        body { font-family: Arial; background: #111; color: #eee; margin: 0; padding: 0; }
+        .container { width: 850px; margin: 40px auto; }
+        input, select { margin-bottom: 10px; padding: 5px; font-size: 16px; width: 100%; background-color: #222; color:white;}
+        select { max-height: 200px; overflow-y: auto; }
+        pre { background: #222; padding: 15px; border-radius: 6px; max-height: 400px; overflow-x: auto; overflow-y: auto; white-space: pre-wrap; }
+        .stats { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; }
+        .stat-block { background: rgba(34,34,34,0.85); padding: 15px; border-radius: 8px; flex: 1 1 180px; min-width: 180px; box-shadow: 0 0 10px #000; }
+        .stat-title { font-weight: bold; color: #fff; margin-bottom: 5px; font-size: 14px; }
+        .stat-value { font-size: 18px; color: #e2e1c9; }
+        .win { color: #4caf50; font-weight: bold; }
+        .loss { color: #f44336; font-weight: bold; }
+    </style>
+    <link rel="stylesheet" type="text/css" href="index.css">
+</head>
+<body>
+<div class="container">
+    <h1>CS2 Stats Dashboard</h1>
+    <label for="searchInput">Search JSON files:</label>
+    <input type="text" id="searchInput" placeholder="Type to filter...">
+    <label for="jsonSelect">Select JSON file:</label>
+    <select id="jsonSelect" size="10"></select>
+
+    <div class="stats" id="statsContainer"></div>
+
+    <h3>Raw JSON:</h3>
+    <pre id="jsonDisplay">{}</pre>
+</div>
+
+<script>
+const select = document.getElementById('jsonSelect');
+const display = document.getElementById('jsonDisplay');
+const statsContainer = document.getElementById('statsContainer');
+const searchInput = document.getElementById('searchInput');
+let allFiles = [];
+
+// === Custom Order ===
+const order = [
+    "player_name",
+    "map_name",
+    "mode",
+    "kd_ratio",
+    "player_stats",
+    "round_scores",
+    "win",
+    "timestamp"
+];
+
+const playerStatsOrder = [
+    "headshot_percentage",
+    "kills",
+    "mvps",
+    "deaths",
+    "assists",
+    "score"
+];
+
+// === Fetch list of matches ===
+fetch('unknown/listOfMatches.json')
+.then(res => {
+    if (!res.ok) throw new Error('Could not fetch file list: ' + res.status);
+    return res.json();
+})
+.then(files => {
+    allFiles = files.sort((a, b) => b.localeCompare(a)); // reverse alphabetical
+    updateDropdown(allFiles);
+    if (allFiles.length > 0) loadJSON(allFiles[0]);
+})
+.catch(err => display.textContent = 'Error fetching file list: ' + err);
+
+function updateDropdown(files) {
+    select.innerHTML = '';
+    files.forEach(file => {
+        const option = document.createElement('option');
+        option.value = file;
+        option.textContent = file.split('/').pop();
+        select.appendChild(option);
+    });
+}
+
+function loadJSON(file) {
+    fetch(file)
+    .then(res => {
+        if (!res.ok) throw new Error('File not found: ' + file);
+        return res.json();
+    })
+    .then(data => {
+        display.textContent = JSON.stringify(data, null, 2);
+        renderPrettyStats(data);
+    })
+    .catch(err => display.textContent = 'Error loading JSON: ' + err);
+}
+
+function renderPrettyStats(data) {
+    statsContainer.innerHTML = '';
+
+    order.forEach(key => {
+        if (key === "kd_ratio") {
+            const kills = data.player_stats?.kills ?? 0;
+            const deaths = data.player_stats?.deaths ?? 1;
+            const kd = (kills / Math.max(1, deaths)).toFixed(2);
+            addStat("K/D Ratio", kd, kd > 1 ? "limegreen" : "red");
+
+        } else if (key === "round_scores" && data.round_scores) {
+            const playerTeam = data.player_name.includes("(CT)") ? "CT" : "T";
+            const otherTeam = playerTeam === "CT" ? "T" : "CT";
+            addStat("Score", `${playerTeam} ${data.round_scores[playerTeam]} - ${otherTeam} ${data.round_scores[otherTeam]}`);
+
+        } else if (key === "player_stats" && data.player_stats) {
+            playerStatsOrder.forEach(stat => {
+                if (!(stat in data.player_stats)) return;
+
+                const value = data.player_stats[stat];
+                if (stat === "headshot_percentage") {
+                    addStat("Headshot %", value + "%", value > 33 ? "limegreen" : "red");
+                } else {
+                    const title = stat.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+                    addStat(title, value);
+                }
+            });
+
+        } else if (data[key] !== undefined) {
+            if (key === "win") {
+                addStat("Win/Loss", data.win ? "WIN" : "LOSS", data.win ? "#4caf50" : "#f44336");
+            } else {
+                addStat(key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()), data[key]);
+            }
+        }
+    });
+}
+
+function addStat(title, value, color=null) {
+    const block = document.createElement("div");
+    block.className = "stat-block";
+    block.innerHTML = `<div class="stat-title">${title}</div>
+                       <div class="stat-value" ${color ? `style="color:${color}"` : ""}>${value}</div>`;
+    statsContainer.appendChild(block);
+}
+
+// === Search Filter ===
+searchInput.addEventListener('input', () => {
+    const term = searchInput.value.toLowerCase();
+    const filtered = allFiles.filter(f => f.toLowerCase().includes(term));
+    updateDropdown(filtered);
+});
+
+select.addEventListener('change', () => loadJSON(select.value));
+</script>
+</body>
+</html>
