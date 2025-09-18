@@ -1,0 +1,24 @@
+{
+  "player_name": "CLMilkshake",
+  "map_name": "de_vertigo",
+  "mode": "unknown",
+  "round": 16,
+  "round_scores": {
+    "CT": 7,
+    "T": 9
+  },
+  "player_stats": {
+    "kills": 15,
+    "assists": 1,
+    "deaths": 7,
+    "mvps": 6,
+    "score": 33,
+    "health": 28,
+    "armor": 99,
+    "money": 7400,
+    "headshot_percentage": 0.0
+  },
+  "win": true,
+  "teammates": [],
+  "timestamp": "2025-09-18T14:46:40.175354"
+}
