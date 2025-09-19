@@ -5,21 +5,21 @@
   "round": 1,
   "round_scores": {
     "CT": 1,
-    "T": 0
+    "T": 1
   },
   "player_stats": {
-    "kills": 0,
+    "kills": 1,
     "assists": 0,
-    "deaths": 0,
-    "mvps": 0,
-    "score": 0,
+    "deaths": 1,
+    "mvps": 1,
+    "score": 10,
     "health": 100,
-    "armor": 0,
-    "money": 800,
-    "headshot_percentage": 0
+    "armor": 100,
+    "money": 3500,
+    "headshot_percentage": 33.0
   },
   "win": true,
   "teammates": [],
   "match_share_code": null,
-  "timestamp": "2025-09-18T17:58:29.537287"
+  "timestamp": "2025-09-18T16:10:23.940249"
 }
