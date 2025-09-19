@@ -21,6 +21,7 @@
 <body>
 <div class="container">
     <h1>CS2 Stats Dashboard</h1>
+    <h4 style="color: #999;">Key: Competitive / Premier - competitive | Wingman - scrimcomp2v2</h4>
     <label for="searchInput">Search JSON files:</label>
     <input type="text" id="searchInput" placeholder="Type to filter...">
     <label for="jsonSelect">Select JSON file:</label>
@@ -60,25 +61,37 @@ const playerStatsOrder = [
     "score"
 ];
 
-// === Fetch list of matches ===
-fetch('unknown/listOfMatches.json')
-.then(res => {
-    if (!res.ok) throw new Error('Could not fetch file list: ' + res.status);
-    return res.json();
-})
-.then(files => {
-    allFiles = files.sort((a, b) => b.localeCompare(a)); // reverse alphabetical
+// === Directories that contain listOfMatches.json ===
+const matchDirs = [
+    "unknown/listOfMatches.json",
+    "scrimcomp2v2/listOfMatches.json",
+    "competitive/listOfMatches.json"
+];
+
+// === Load all match lists ===
+Promise.all(
+    matchDirs.map(path =>
+        fetch(path)
+            .then(res => res.ok ? res.json() : [])
+            .catch(() => [])
+    )
+).then(results => {
+    // Merge all results into one list
+    allFiles = results.flat().sort((a, b) => b.localeCompare(a));
+
     updateDropdown(allFiles);
+
     if (allFiles.length > 0) loadJSON(allFiles[0]);
-})
-.catch(err => display.textContent = 'Error fetching file list: ' + err);
+}).catch(err => {
+    display.textContent = "Error fetching match lists: " + err;
+});
 
 function updateDropdown(files) {
     select.innerHTML = '';
     files.forEach(file => {
         const option = document.createElement('option');
         option.value = file;
-        option.textContent = file.split('/').pop();
+        option.textContent = file.split('/').pop(); // just filename
         select.appendChild(option);
     });
 }
@@ -151,5 +164,6 @@ searchInput.addEventListener('input', () => {
 
 select.addEventListener('change', () => loadJSON(select.value));
 </script>
+
 </body>
 </html>
