@@ -1,0 +1,25 @@
+{
+  "player_name": "CLMilkshake (T)",
+  "map_name": "de_inferno",
+  "mode": "scrimcomp2v2",
+  "round": 16,
+  "round_scores": {
+    "CT": 8,
+    "T": 8
+  },
+  "player_stats": {
+    "kills": 7,
+    "assists": 4,
+    "deaths": 11,
+    "mvps": 2,
+    "score": 24,
+    "health": 0,
+    "armor": 0,
+    "money": 8000,
+    "headshot_percentage": 71.4
+  },
+  "win": true,
+  "teammates": [],
+  "match_share_code": null,
+  "timestamp": "2025-09-20T21:31:03.046206"
+}
