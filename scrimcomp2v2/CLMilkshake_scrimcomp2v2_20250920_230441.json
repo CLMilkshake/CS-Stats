@@ -1,0 +1,25 @@
+{
+  "player_name": "CLMilkshake (CT)",
+  "map_name": "de_nuke",
+  "mode": "scrimcomp2v2",
+  "round": 13,
+  "round_scores": {
+    "CT": 9,
+    "T": 4
+  },
+  "player_stats": {
+    "kills": 12,
+    "assists": 1,
+    "deaths": 5,
+    "mvps": 7,
+    "score": 31,
+    "health": 100,
+    "armor": 100,
+    "money": 3000,
+    "headshot_percentage": 66.7
+  },
+  "win": true,
+  "teammates": [],
+  "match_share_code": null,
+  "timestamp": "2025-09-20T23:04:41.886733"
+}
